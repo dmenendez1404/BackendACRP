@@ -24,7 +24,7 @@ SECRET_KEY = '4@)0b41+t*v*(e@pq5&l#i=3zeka1*@2(!oe4s4k@e9rn8j-kq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'acrp.apps.AcrpConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders'
 ]
 
@@ -54,7 +55,6 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
@@ -65,14 +65,15 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
 
-
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
+    '192.168.99.100:8000'
 )
 CORS_ORIGIN_REGEX_WHITELIST = (
     'localhost:8080',
+    '192.168.99.100:8000'
 )
 
 ROOT_URLCONF = 'BackendACRP.urls'
@@ -101,8 +102,11 @@ WSGI_APPLICATION = 'BackendACRP.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': '192.168.99.100',
+        'PORT': '5432',
     }
 }
 
@@ -143,4 +147,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, '/media')
-MEDIA_URL = '/images/'
+MEDIA_URL = '/media/'
