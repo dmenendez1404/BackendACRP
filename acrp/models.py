@@ -55,7 +55,7 @@ class Publicacion(models.Model):
 
 
 class Miembro(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='miembro')
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='miembro')
     centro = models.ForeignKey(Centro, blank=True, on_delete=models.SET_DEFAULT, default=0)
     categoria = models.CharField(max_length=150)
     cargo = models.CharField(max_length=150)

@@ -14,21 +14,6 @@ class NoticiaSerializer(serializers.ModelSerializer):
         model = Noticia
         fields = ('url', 'id', 'titulo', 'imagen', 'categoria', 'descripcion')
 
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'id',
-                  'first_name',
-                  'last_name',
-                  'username',
-                  'password',
-                  'email',
-                  'is_staff',
-                  'is_active',
-                  'date_joined')
-
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
@@ -136,7 +121,6 @@ class EventoSerializer(serializers.ModelSerializer):
             'descripcion',
             'fecha')
 
-
 class MiembroSerializer(serializers.ModelSerializer):
     # usuario = UserSerializer()
     def __init__(self, *args, **kwargs):
@@ -144,7 +128,7 @@ class MiembroSerializer(serializers.ModelSerializer):
         request = kwargs['context']['request']
         if request.method != 'PUT' and request.method != 'POST':
             self.fields['centro'] = CentroSerializer()
-            self.fields['usuario'] = UserSerializer()
+            self.fields['usuario'] = UserSerializer(context={'request': request})
             self.fields['proyectos'] = ProyectoSerializer(context={'request': request}, many=True)
             self.fields['publicaciones'] = PublicacionSerializer(context={'request': request}, many=True)
             self.fields['boletines'] = BoletinSerializer(context={'request': request}, many=True)
@@ -164,3 +148,54 @@ class MiembroSerializer(serializers.ModelSerializer):
                   'publicaciones',
                   'mensajes',
                   )
+
+class RegistrarMiembroSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Miembro
+        fields = ('url', 'id',
+                  'activo',
+                  'centro',
+                  'categoria',
+                  'cargo',
+                  'resumenCV',
+                  'foto',
+                  )
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super(UserSerializer, self).__init__(*args, **kwargs)
+        request = kwargs['context']['request']
+        if request.method == 'PUT' or request.method == 'POST':
+            self.fields['miembro'] = RegistrarMiembroSerializer(context={'request': request})
+
+    def create(self, validated_data, instance=None):
+        miembro = validated_data.pop('miembro')
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        Miembro.objects.create(usuario=user, **miembro)
+        return user
+
+    def update(self, instance, validated_data):
+        miembro = validated_data.pop('miembro')
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data['password'])
+        User.objects.update_or_create(user=user)
+        Miembro.objects.update_or_create(usuario=user, **miembro)
+        return user
+
+    class Meta:
+        model = User
+        fields = ('url', 'id',
+                  'first_name',
+                  'last_name',
+                  'username',
+                  'password',
+                  'email',
+                  'is_staff',
+                  'is_active',
+                  'date_joined',
+                  'miembro')
