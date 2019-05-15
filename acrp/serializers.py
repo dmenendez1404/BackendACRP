@@ -6,11 +6,16 @@ from django.contrib.auth import authenticate
 class CentroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Centro
-        fields = ('url', 'id', 'nombre', 'logo', 'direccion')
+        fields = ('url', 'id', 'nombre', 'logo', 'direccion', 'activo')
+
+
+class NoticiaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Noticia
+        fields = ('url', 'id', 'titulo', 'imagen', 'categoria', 'descripcion')
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # url = serializers.HyperlinkedRelatedField(view_name='api:userprofile-detail', source='miembro')
     class Meta:
         model = User
         fields = ('url', 'id',
@@ -49,6 +54,12 @@ class LoginSerializer(serializers.Serializer):
 
 
 class PublicacionSerializer(serializers.ModelSerializer):
+    # def __init__(self, *args, **kwargs):
+    #     super(PublicacionSerializer, self).__init__(*args, **kwargs)
+    #     request = kwargs['context']['request']
+    #     if request.method != 'PUT' and request.method != 'POST':
+
+    # self.fields['autores'] = MiembroSerializer(context={'request': request},many=True)
     class Meta:
         model = Publicacion
         fields = (
@@ -57,10 +68,31 @@ class PublicacionSerializer(serializers.ModelSerializer):
             'titulo',
             'categoria',
             'pdf',
+            'descripcion',
+            'fecha',
+            'autores')
+
+
+class BoletinSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Boletin
+        fields = (
+            'url',
+            'id',
+            'titulo',
+            'fecha',
+            'pdf',
+            'descripcion',
             'autores')
 
 
 class ProyectoSerializer(serializers.ModelSerializer):
+    # def __init__(self, *args, **kwargs):
+    #     super(ProyectoSerializer, self).__init__(*args, **kwargs)
+    #     request = kwargs['context']['request']
+    #     if request.method != 'PUT' and request.method != 'POST':
+    #         self.fields['miembros'] = MiembroSerializer(context={'request': request},many=True)
     class Meta:
         model = Proyecto
         fields = (
@@ -69,8 +101,21 @@ class ProyectoSerializer(serializers.ModelSerializer):
             'titulo',
             'categoria',
             'pdf',
+            'descripcion',
             'miembros')
 
+class MensajeSerializer(serializers.ModelSerializer):
+   class Meta:
+        model = Mensaje
+        fields = (
+            'url',
+            'id',
+            'nombreRemitente',
+            'correoRemitente',
+            'telefonoRemitente',
+            'fecha',
+            'mensaje',
+            'miembros')
 
 class EventoSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
@@ -88,6 +133,7 @@ class EventoSerializer(serializers.ModelSerializer):
             'categoria',
             'direccion',
             'centro',
+            'descripcion',
             'fecha')
 
 
@@ -98,8 +144,11 @@ class MiembroSerializer(serializers.ModelSerializer):
         request = kwargs['context']['request']
         if request.method != 'PUT' and request.method != 'POST':
             self.fields['centro'] = CentroSerializer()
-            self.fields['proyectos'] = ProyectoSerializer(context={'request': request},many=True)
-            self.fields['publicaciones'] = PublicacionSerializer(context={'request': request},many=True)
+            self.fields['usuario'] = UserSerializer()
+            self.fields['proyectos'] = ProyectoSerializer(context={'request': request}, many=True)
+            self.fields['publicaciones'] = PublicacionSerializer(context={'request': request}, many=True)
+            self.fields['boletines'] = BoletinSerializer(context={'request': request}, many=True)
+            self.fields['mensajes'] = MensajeSerializer(context={'request': request}, many=True)
 
     class Meta:
         model = Miembro
@@ -108,8 +157,10 @@ class MiembroSerializer(serializers.ModelSerializer):
                   'centro',
                   'usuario',
                   'categoria',
+                  'cargo',
                   'resumenCV',
                   'foto',
                   'proyectos',
                   'publicaciones',
+                  'mensajes',
                   )
