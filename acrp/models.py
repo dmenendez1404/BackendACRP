@@ -65,6 +65,7 @@ class Miembro(models.Model):
     boletines = models.ManyToManyField(Boletin, related_name='autores', blank=True)
     publicaciones = models.ManyToManyField(Publicacion, related_name='autores', blank=True)
     mensajes = models.ManyToManyField(Mensaje, related_name='miembros', blank=True)
+    rol = models.CharField(max_length=50)
 
     def __str__(self):
         return self.usuario.first_name + ' ' + self.usuario.last_name

@@ -147,7 +147,7 @@ class MiembroSerializer(serializers.ModelSerializer):
                   'proyectos',
                   'publicaciones',
                   'mensajes',
-                  )
+                  'rol')
 
 class RegistrarMiembroSerializer(serializers.ModelSerializer):
 
@@ -180,12 +180,10 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        miembro = validated_data.pop('miembro')
-        user = User.objects.create(**validated_data)
-        user.set_password(validated_data['password'])
-        User.objects.update_or_create(user=user)
-        Miembro.objects.update_or_create(usuario=user, **miembro)
-        return user
+        Miembro.objects.update(**validated_data['miembro'])
+        User.objects.update(**validated_data)
+        print("hey")
+        return instance
 
     class Meta:
         model = User
