@@ -149,6 +149,25 @@ class MiembroSerializer(serializers.ModelSerializer):
                   'mensajes',
                   'rol')
 
+class UpdateMiembroSerializer(serializers.ModelSerializer):
+    # usuario = UserSerializer()
+    def __init__(self, *args, **kwargs):
+        super(UpdateMiembroSerializer, self).__init__(*args, **kwargs)
+        request = kwargs['context']['request']
+        if request.method != 'PUT' and request.method != 'POST':
+            self.fields['centro'] = CentroSerializer()
+
+    class Meta:
+        model = Miembro
+        fields = ('url', 'id',
+                  'activo',
+                  'centro',
+                  'categoria',
+                  'cargo',
+                  'resumenCV',
+                  'foto',
+                  'rol')
+
 class RegistrarMiembroSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -180,9 +199,10 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        Miembro.objects.update(**validated_data['miembro'])
-        User.objects.update(**validated_data)
-        print("hey")
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.miembro = validated_data.get('miembro', instance.miembro)
+        instance = super().update(instance, validated_data)
         return instance
 
     class Meta:

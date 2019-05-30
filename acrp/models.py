@@ -43,6 +43,8 @@ class Mensaje(models.Model):
     def __str__(self):
         return self.fecha.__str__()
 
+
+
 class Publicacion(models.Model):
     titulo = models.CharField(max_length=75)
     categoria = models.CharField(max_length=150)

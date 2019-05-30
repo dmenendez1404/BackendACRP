@@ -1,7 +1,7 @@
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import viewsets, status
 from rest_framework.authtoken.views import ObtainAuthToken
-
+from rest_framework.generics import UpdateAPIView
 from acrp.serializers import *
 
 from rest_framework.permissions import IsAuthenticated
@@ -87,17 +87,12 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = self.serializer_class(user, data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            user.set_password(serializer.data.get('password'))
-            user.save()
-            return Response(serializer.data)
-        return Response({'message': True})
-
+class UpdateMiembroViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = [TokenAuthentication]
+    queryset = Miembro.objects.all()
+    serializer_class = UpdateMiembroSerializer
 
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
